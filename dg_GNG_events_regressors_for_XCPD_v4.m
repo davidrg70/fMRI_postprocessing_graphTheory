@@ -455,7 +455,8 @@ for i = 1:numel(common_IDs) % loop over each participant!
         matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {''};
         matlabbatch{1}.spm.stats.fmri_spec.sess.hpf = 128;
         matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
-        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0]; % no time derivative and no dispersion derivative
+        % matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0]; % no temporal derivative and no dispersion derivative
+        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [1 0]; % with temporal derivative and without dispersion derivative
         matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
         matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
         matlabbatch{1}.spm.stats.fmri_spec.mthresh = 0.8;
@@ -480,6 +481,10 @@ for i = 1:numel(common_IDs) % loop over each participant!
             saveas(gcf, image_filename);
             clean_name = string(extractBefore(clean_name, '_space-'));
             fprintf('--Events and plot saved: %s \n',clean_name);
+
+            % save new events names (incl. temporal derivatives of each event regressor)
+            SPM.Sess.FC_new = out.condNames;
+            save(spm_matfilename,'SPM');
         else
             warning('--> No preproc nii nor events .mat file found for %s Regular run %s', num2str(current_id), num2str(indx));
         end
@@ -497,7 +502,7 @@ for i = 1:numel(common_IDs) % loop over each participant!
         end
         %     then, get task events names in the same order they were convolved
         %     take them from the SPM.mat file :)
-        events_names = {SPM.Sess.Fc.name}; % tasks events names saved by SPM
+        events_names = SPM.Sess.FC_new; % tasks events names just before in the SPM.mat
         convolved_events = SPM.xX.X; % design matrix from SPM
         % WAIT! REMOVE THE CONSTANT TERM / INTERCEPT ARRAY, XCP-D DOESN'T NEED IT!
         % SPM adds a column of ones to the GLM design because that column is the
@@ -873,7 +878,8 @@ for i = 1:numel(common_IDs) % loop over each participant!
         matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {''};
         matlabbatch{1}.spm.stats.fmri_spec.sess.hpf = 128;
         matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
-        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0]; % no time derivative and no dispersion derivative
+        % matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0]; % no temporal derivative and no dispersion derivative
+        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [1 0]; % with temporal derivative and without dispersion derivative
         matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
         matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
         matlabbatch{1}.spm.stats.fmri_spec.mthresh = 0.8;
@@ -898,6 +904,10 @@ for i = 1:numel(common_IDs) % loop over each participant!
             saveas(gcf, image_filename);
             clean_name = string(extractBefore(clean_name, '_space-'));
             fprintf('--Events and plot saved: %s \n',clean_name);
+
+            % save new events names (incl. temporal derivatives of each event regressor)
+            SPM.Sess.FC_new = out.condNames;
+            save(spm_matfilename,'SPM');
         else
             warning('--> No preproc nii nor events .mat file found for %s Regular run %s', num2str(current_id), num2str(indx));
         end
@@ -916,7 +926,7 @@ for i = 1:numel(common_IDs) % loop over each participant!
 
         %     then, get task events names in the same order they were convolved
         %     take them from the SPM.mat file :)
-        events_names = {SPM.Sess.Fc.name}; % tasks events names saved by SPM
+        events_names = SPM.Sess.FC_new; % tasks events names just saved in the SPM.mat
         convolved_events = SPM.xX.X; % design matrix from SPM
         % WAIT! REMOVE THE CONSTANT TERM / INTERCEPT ARRAY, XCP-D DOESN'T NEED IT!
         % SPM adds a column of ones to the GLM design because that column is the
